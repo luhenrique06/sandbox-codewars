@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel da Prova</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin">
+
+  <section id="screen-login" class="screen center">
+    <form id="login-form" class="card">
+      <h1>Painel do professor</h1>
+      <label>Senha <input id="pass" type="password" required autofocus></label>
+      <p id="login-error" class="error"></p>
+      <button class="btn primary">Entrar</button>
+    </form>
+  </section>
+
+  <main id="screen-panel" hidden>
+    <div class="controls">
+      <strong>Prova:</strong> <span id="exam-status" class="tag wait"></span>
+      <span id="exam-timer" class="pill"></span>
+      <span class="spacer"></span>
+      <label>Duração (min) <input id="duration" type="number" value="120" min="1"></label>
+      <button id="btn-start" class="btn primary">Iniciar prova</button>
+      <button class="btn js-extend" data-min="5">+5 min</button>
+      <button class="btn js-extend" data-min="15">+15 min</button>
+      <button id="btn-end" class="btn danger">Encerrar prova</button>
+    </div>
+
+    <div class="controls">
+      <button id="btn-unlock-all" class="btn">Liberar todos</button>
+      <button id="btn-csv" class="btn">Exportar notas (CSV)</button>
+      <button id="btn-sim" class="btn">Similaridade de código</button>
+      <label><input id="sound" type="checkbox" checked style="width:auto;display:inline"> Som ao travar</label>
+      <span class="spacer"></span>
+      <span id="conn" class="dot" title="Conexão"></span>
+    </div>
+
+    <div class="stats">
+      <div class="stat">Alunos<b id="st-total">0</b></div>
+      <div class="stat">Equipes<b id="st-teams">0</b></div>
+      <div class="stat">Online<b id="st-online">0</b></div>
+      <div class="stat">Travados<b id="st-locked">0</b></div>
+      <div class="stat">Média<b id="st-avg">–</b></div>
+      <div class="stat">Fila do juiz<b id="st-queue">0</b></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2 id="modal-title" style="margin:0"></h2>
+        <span class="spacer"></span>
+        <button id="modal-unlock" class="btn primary" hidden>Liberar</button>
+        <button id="modal-close" class="btn">Fechar</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

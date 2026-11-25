@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prova — Técnicas de Programação</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="aluno">
+
+  <!-- Login -->
+  <section id="screen-login" class="screen center" hidden>
+    <form id="login-form" class="card">
+      <h1>Técnicas de Programação</h1>
+      <p class="muted">Prova prática em C</p>
+      <label>Seu nome completo <input id="login-name" autocomplete="off" required></label>
+      <label>Seu RA <input id="login-ra" autocomplete="off" required></label>
+      <fieldset class="pair">
+        <legend>Dupla <span class="muted">(opcional)</span></legend>
+        <p class="hint muted">Deixe em branco se for fazer a prova sozinho.</p>
+        <label>Nome do segundo aluno <input id="login-name2" autocomplete="off"></label>
+        <label>RA do segundo aluno <input id="login-ra2" autocomplete="off"></label>
+      </fieldset>
+      <label>Código da prova <input id="login-code" autocomplete="off" required placeholder="escrito no quadro"></label>
+      <p id="login-error" class="error"></p>
+      <button type="submit" class="btn primary">Entrar</button>
+    </form>
+  </section>
+
+  <!-- Espera / instruções -->
+  <section id="screen-wait" class="screen center" hidden>
+    <div class="card wide">
+      <h1>Olá, <span class="js-name"></span></h1>
+      <p class="muted" id="wait-msg">Aguardando o professor iniciar a prova…</p>
+      <h2>Instruções</h2>
+      <ul class="rules">
+        <li><b>Não saia desta página.</b> Trocar de aba, usar Alt+Tab, minimizar, apertar <kbd>Esc</kbd> ou sair da tela cheia <b>trava a prova</b>. Só o professor libera.</li>
+        <li>Entrada e saída devem seguir <b>exatamente</b> o formato do enunciado. Não imprima mensagens como <code>"Digite um número:"</code>.</li>
+        <li><b>Executar</b> roda seu programa com a entrada que você digitar. <b>Testar exemplos</b> confere os exemplos do enunciado.</li>
+        <li><b>Enviar</b> corrige com casos de teste ocultos e responde apenas <i>Aceito</i> ou <i>Não aceito</i>. Pode enviar quantas vezes quiser.</li>
+        <li>Colar texto de fora do editor está bloqueado. Seu código é salvo automaticamente.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Prova -->
+  <section id="screen-exam" class="screen" hidden>
+    <header class="topbar">
+      <strong>Técnicas de Programação</strong>
+      <span class="js-name muted"></span>
+      <span class="spacer"></span>
+      <span id="score" class="pill"></span>
+      <span id="timer" class="pill timer"></span>
+      <span id="conn" class="dot" title="Conexão"></span>
+    </header>
+    <div class="layout">
+      <nav id="problem-list" class="sidebar"></nav>
+      <article id="statement" class="statement"></article>
+      <div class="workspace">
+        <div class="editor-wrap"><textarea id="editor"></textarea></div>
+        <div class="toolbar">
+          <button id="btn-run" class="btn">▶ Executar <small>Ctrl+Enter</small></button>
+          <button id="btn-examples" class="btn">Testar exemplos</button>
+          <span class="spacer"></span>
+          <button id="btn-submit" class="btn primary">Enviar solução</button>
+        </div>
+        <div class="io">
+          <label class="io-in">Entrada
+            <textarea id="input" spellcheck="false"></textarea>
+          </label>
+          <div class="io-out">
+            <span>Resultado</span>
+            <div id="output" class="output"><p class="muted">Execute ou envie para ver o resultado.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prova encerrada -->
+  <section id="screen-ended" class="screen center" hidden>
+    <div class="card">
+      <h1>Prova encerrada</h1>
+      <p><span class="js-name"></span>, sua prova foi recebida.</p>
+      <p class="big" id="ended-score"></p>
+      <p class="muted">Você já pode sair da tela cheia.</p>
+    </div>
+  </section>
+
+  <!-- Overlays -->
+  <div id="gate" class="overlay" hidden>
+    <div class="card">
+      <h1 id="gate-title">Pronto para começar?</h1>
+      <p id="gate-msg">A prova abre em tela cheia. A partir daqui, sair da tela cheia, trocar de aba ou usar Alt+Tab trava a prova.</p>
+      <button id="gate-btn" class="btn primary big">Entrar em tela cheia</button>
+    </div>
+  </div>
+
+  <div id="lock" class="overlay lock" hidden>
+    <div class="card">
+      <div class="lock-icon">🔒</div>
+      <h1>Prova bloqueada</h1>
+      <p>Motivo: <b id="lock-reason"></b></p>
+      <p>Levante a mão e chame o professor. A prova só volta quando ele liberar.</p>
+    </div>
+  </div>
+
+  <div id="kicked" class="overlay" hidden>
+    <div class="card">
+      <h1>Sessão encerrada</h1>
+      <p>Seu RA entrou na prova em outra aba ou computador. Chame o professor.</p>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="aluno.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+# Sistema completo: app (site + juiz) + túnel ngrok.
+# Nenhuma porta é publicada no host: o único acesso de fora é pelo túnel do ngrok (conexão de saída).
+#
+# .env (chmod 600) precisa de: ADMIN_PASS, EXAM_CODE, NGROK_AUTHTOKEN, NGROK_URL, DOCKER_GID
+services:
+  app:
+    build: .
+    image: provafap-app
+    restart: unless-stopped
+    environment:
+      ADMIN_PASS: ${ADMIN_PASS:?defina ADMIN_PASS no .env}
+      EXAM_CODE: ${EXAM_CODE:?defina EXAM_CODE no .env}
+      JUDGE_CONCURRENCY: ${JUDGE_CONCURRENCY:-2}
+      DATA_DIR: /data
+      JOBS_DIR: /srv/provafap/jobs
+    volumes:
+      # Necessário para o juiz criar os containers de correção. Dá ao app poder de root no host:
+      # por isso o app não publica porta, roda sem capabilities e com sistema de arquivos somente leitura.
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/provafap/jobs:/srv/provafap/jobs
+      - ./data:/data
+    group_add:
+      - ${DOCKER_GID:?defina DOCKER_GID no .env}
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    expose:
+      - "3000"
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  ngrok:
+    image: ngrok/ngrok:3
+    restart: unless-stopped
+    command: ["http", "app:3000", "--url=${NGROK_URL:?defina NGROK_URL no .env}", "--log=stdout"]
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:?defina NGROK_AUTHTOKEN no .env}
+    depends_on:
+      - app
+    # Sem read_only: o entrypoint da imagem oficial grava o authtoken ao lado do ngrok.yml dela.
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }

@@ -1,0 +1,12 @@
+node_modules
+data
+.env
+*.key
+*.pem
+*.pdf
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+DEPLOY.md
